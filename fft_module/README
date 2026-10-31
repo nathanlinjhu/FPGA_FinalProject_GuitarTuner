@@ -1,0 +1,5 @@
+For the FFT, we instantiated an IP module provided by AMD.
+The link to the documentation that was used is: https://support.amd.com/documentation/ipcores/xfft/9_1 
+
+Our settings to configure are in the .xci file 
+and the .vho file is the VHDL instantiate template shoiwing its ports
