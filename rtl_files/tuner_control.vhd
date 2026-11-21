@@ -35,7 +35,6 @@ entity tuner_control is
        motor_count_o : out int4_t;
        green_o : out std_logic_vector(3 downto 0);
        red_o : out std_logic_vector(3 downto 0);
-       white_o : out std_logic_vector(3 downto 0);
        running_o : out std_logic_vector(3 downto 0);
        done_o : out std_logic_vector(3 downto 0);
        fault_o : out std_logic
@@ -71,7 +70,7 @@ architecture rtl of tuner_control is
   signal streak : natural range 0 to CONFIRM_FRAMES := 0;
   signal counts : int4_t := (others => 0);
   signal totals : int4_t := (others => 0);
-  signal dirs,green,red,white : std_logic_vector(3 downto 0) := (others=>'0');
+  signal dirs,green,red : std_logic_vector(3 downto 0) := (others=>'0');
   signal fault : std_logic := '0';
   signal active : std_logic := '0';
 
@@ -93,7 +92,6 @@ begin
   motor_dir_o<=dirs;
   green_o<=green;
   red_o<=red;
-  white_o<=white;
 
   process(clk)
     -- error = input frequency - target
@@ -115,7 +113,6 @@ begin
         state<=IDLE;
         green<=(others=>'0');
         red<=(others=>'0');
-        white<=(others=>'0');
         counts<=(others=>0);
         totals<=(others=>0);
         streak<=0;
@@ -141,7 +138,6 @@ begin
               state<=REQUEST_FRAME;
               green<=(others=>'0');
               red<=(others=>'0');
-              white<=(others=>'0');
               counts<=(others=>0);
               totals<=(others=>0);
               streak<=0;
@@ -164,7 +160,6 @@ begin
                 n:=0;
 	        green(i)<='0';
                 red(i)<='0';
-                white(i)<='0';
 		--Invalid string keeps zero requested pulses; LEDs off; completion will be disallowed
                 if (valid_i(i)='0') then
 		  all_ok:=false;
@@ -183,6 +178,7 @@ begin
 		  -- If error is less than tolerance, light up LED
                   if (error_mag<=TOL_Q8(i)) then 
 		    green(i)<='1';
+		    red(i)<='1';
                   else
                     all_ok:=false;
 		    -- Modify tuning direction + LEDs based on error 
@@ -190,7 +186,7 @@ begin
 		      red(i)<='1';
                       dirs(i)<=TIGHTEN_DIR(i);
                     else 
-                      white(i)<='1';
+                      green(i)<='1';
                       dirs(i)<=not TIGHTEN_DIR(i);
                     end if;
 
@@ -205,7 +201,8 @@ begin
               end loop;
 	-- If all four strings are valid & in tune, see if we have confirmed this behavior for enough cycles. Otherwise (in watchdog elsif),  
               if (all_ok) then
-                if streak=CONFIRM_FRAMES-1 then 				          state<=DONE;
+                if streak=CONFIRM_FRAMES-1 then 				          
+	          state<=DONE;
 		  streak<=CONFIRM_FRAMES;
                 else 
 		  streak<=streak+1;
@@ -214,7 +211,8 @@ begin
               else
                 streak<=0;
 		-- Exceed max movements, then immediately stop, otherwise then launch the FSM again
-                if (limit_hit) then 				   			  state<=STOPPED;
+                if (limit_hit) then 				   			  
+	          state<=STOPPED;
 		  fault<='1';
 		  counts<=(others=>0);
                 elsif (any_move) then 
@@ -223,22 +221,26 @@ begin
 		  state<=REQUEST_FRAME;
 		end if;
               end if;
-            elsif watchdog=WATCHDOG_TICKS-1 then 			   	      state<=STOPPED;
+            elsif watchdog=WATCHDOG_TICKS-1 then 			   	      
+	      state<=STOPPED;
 	      fault<='1';
 	      counts<=(others=>0);
             else 
 	      watchdog<=watchdog+1;
 	    end if;
+
           -- In this state, motor controllers accept commands and update the total commands given
           when LAUNCH =>
             for i in 0 to 3 loop 
 	      totals(i)<=totals(i)+counts(i);
 	    end loop;
             state<=LAUNCH_WAIT;
+
           -- Give time between command and checking completion
           when LAUNCH_WAIT => 
 	    state<=MOVING;
 	    watchdog<=0;
+
           -- If motors are idle then allow it to settle, otherwise wait and increment watchdog
           when MOVING =>
             if motor_busy_i="0000" then 
@@ -249,6 +251,7 @@ begin
             else 
 	      watchdog<=watchdog+1;
 	    end if;
+
 	 -- Allow system to settle before another measurement (200ms)
           when SETTLING =>
             if (settle_count=SETTLE_TICKS-1) then 
