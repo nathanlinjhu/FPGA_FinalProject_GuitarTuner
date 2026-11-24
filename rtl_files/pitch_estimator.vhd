@@ -14,16 +14,16 @@ entity pitch_estimator is
        -- done_o =  a clock pulse when the four strings have been processed
        -- valid_o = one flag per string indicating an accepted pitch range
        -- pitch_q8_o = estimated pitches in (measured in 1/256 of an FFT bin) for 4 strings
-        clk : in std_logic;
+    clk : in std_logic;
 	rst : in std_logic;
-        data_i : in std_logic_vector(31 downto 0);
-        user_i : in std_logic_vector(23 downto 0);
-        valid_i: in std_logic;
+    data_i : in std_logic_vector(31 downto 0);
+    user_i : in std_logic_vector(23 downto 0);
+    valid_i: in std_logic;
 	last_i : in std_logic;
 	frame_good_i : in std_logic;
-        done_o : out std_logic;
-        valid_o : out std_logic_vector(3 downto 0);
-        pitch_q8_o : out int4_t
+    done_o : out std_logic;
+    valid_o : out std_logic_vector(3 downto 0);
+    pitch_q8_o : out int4_t
     );
 end entity;
 
@@ -71,10 +71,10 @@ begin
  	-- im = imaginary part of FFT output
 	-- rr = real part squared
 	-- ii = imaginary part squared
-        variable address_v : natural range 0 to 4095;
-        variable re : signed(15 downto 0);
+    variable address_v : natural range 0 to 4095;
+    variable re : signed(15 downto 0);
 	variable im : signed(15 downto 0);
-        variable rr : signed(31 downto 0);
+    variable rr : signed(31 downto 0);
 	variable ii : signed(31 downto 0);
 
     begin
@@ -106,7 +106,7 @@ begin
 	    -- The default completion is LOW, the FINISHED state will override it 
             done_o <= '0';
 	    -- Synchronous active high reset
-            if rst = '1' then
+            if (rst = '1') then
                 state <= RECEIVE;
                 flags <= (others => '0');
                 results <= (others => 0);
@@ -126,8 +126,8 @@ begin
                             ix := to_integer(unsigned(user_i(11 downto 0)));
 
                             if (ix /= sample_count) then 
-			      bad <= '1'; 
-			    end if;
+                                bad <= '1'; 
+                            end if;
 			    -- Increment the sample count as long as it doesn't exceed size
                             if (sample_count < FFT_N) then
                                 sample_count <= sample_count + 1;

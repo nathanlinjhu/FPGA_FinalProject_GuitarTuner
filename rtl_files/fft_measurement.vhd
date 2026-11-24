@@ -176,8 +176,8 @@ begin
 
       -- If we need to read the sample, store index and the Hann coefficient
       if (state=READ_SAMPLE) then 
-	rd<=samples(index_r);
-	wc<=HANN(index_r);
+	      rd<=samples(index_r);
+	      wc<=HANN(index_r);
       end if;
     end if;
   end process;
@@ -199,45 +199,44 @@ begin
         good<='0';
       else
         if (missing='1') or (unexpected='1')
-	  then good<='0';
+	        then good<='0';
 	end if;
  	-- Offer 3032 clock cycles (i.e. the expected timing + a little extra) for capturing to occur
         if (state=CAPTURE) then
           if (sample_gap >= CLK_HZ/SAMPLE_HZ + 32) then
-	    gap_bad<='1';
+	          gap_bad<='1';
           else 
-	    sample_gap<=sample_gap+1;
+	          sample_gap<=sample_gap+1;
 	  end if;
         end if;
 
         case state is
-
           when IDLE =>
             if (start_i='1') then
-	      state<=RESET_FFT;
-	      reset_count<=0;
-	      good<='0';
-	    end if;
+              state<=RESET_FFT;
+              reset_count<=0;
+              good<='0';
+            end if;
 	
 	  -- Spend 16 clock cycles to reset the FFT + estimator
           when RESET_FFT =>
             if (reset_count=15) then 
-	      state<=ARM;
-	    else 
-	      reset_count<=reset_count+1;
-	    end if;
+	            state<=ARM;
+	          else 
+	            reset_count<=reset_count+1;
+	          end if;
 
 	  -- Discard the first sample to make a fresh frame boundary, the next sample is then sample 0
           when ARM =>
             if (adc_valid_i='1') and (adc_id_i="11100") then
               index_r<=0;
-	      total<=0;
-	      adc_minimum<=4095;
-	      adc_maximum<=0;
-	      clipped<='0';
-	      gap_bad<='0';
-	      sample_gap<=0;
-	      state<=CAPTURE;
+              total<=0;
+              adc_minimum<=4095;
+              adc_maximum<=0;
+              clipped<='0';
+              gap_bad<='0';
+              sample_gap<=0;
+              state<=CAPTURE;
             end if;
 
           when CAPTURE =>
@@ -247,48 +246,49 @@ begin
               a:=to_integer(unsigned(adc_data_i(15 downto 4)));
               total<=total+a;
               mn:=adc_minimum;
-	      mx:=adc_maximum;
+	            mx:=adc_maximum;
 
               if (a<mn) then 
-		mn:=a;
-	      end if;
+		            mn:=a;
+	            end if;
 
-	      if (a>mx) then 
-		mx:=a;
-	      end if;
+	            if (a>mx) then 
+		            mx:=a;
+	            end if;
 
-          adc_minimum<=mn;
-	      adc_maximum<=mx;
+              adc_minimum<=mn;
+	            adc_maximum<=mx;
 	      
  	      -- CLIP_LOW = 8 and CLIP_HIGH = 4087 (in pkg file)
               if (a<=CLIP_LOW) or (a>=CLIP_HIGH) then
-	        clipped<='1';
-	      end if;
+	              clipped<='1';
+	            end if;
 
 	      -- On the final sample, it computes the mean and calls sample good if mx-mn is at least 64 ADC counts and there is no clipping or timing gap
               if (index_r=FFT_N-1) then
                 mean<=(total+a)/FFT_N;
   	        -- the last two assignments are there to check the last sample
                 if (mx-mn>=MIN_ADC_PP) and (clipped='0') and (gap_bad='0') and (a>CLIP_LOW) and (a<CLIP_HIGH) then
-	          good<='1';
+	                good<='1';
                 else 
-		  good<='0';
-	        end if;
+		              good<='0';
+	              end if;
                 index_r<=0;
-	        state<=CONFIGURE;
+	              state<=CONFIGURE;
 	      -- If it isn't the final sample just increment (i.e. do it for all 4096 samples)
               else 
-		index_r<=index_r+1;
-	      end if;
+		            index_r<=index_r+1;
+	            end if;
             end if;
 
 	  -- when 4096 samples are taken, this state initiates synchronous sample and coefficient reading
           when CONFIGURE => 
-	    if (config_ready='1') then
-	      state<=READ_SAMPLE;
-	    end if;
+            if (config_ready='1') then
+              state<=READ_SAMPLE;
+            end if;
+
           when READ_SAMPLE => 
-	    state<=PREPARE_SAMPLE;
+	          state<=PREPARE_SAMPLE;
 
 	  --to_integer(rd) - mean removes the DC offset and multply by 8 to use more of 16 bit range
 	  --signed('0' & wc) is the 16 bit Hann coefficient to remove spectral leakage for each index
@@ -302,19 +302,19 @@ begin
           when SEND_SAMPLE =>
             if (din_ready='1') then
               if (index_r=FFT_N-1) then 
-		state<=WAIT_RESULT;
+		            state<=WAIT_RESULT;
               else 
-		index_r<=index_r+1;
-		state<=READ_SAMPLE;
-	      end if;
+                index_r<=index_r+1;
+                state<=READ_SAMPLE;
+	            end if;
             end if;
 
 	  -- Finish the measurement, produce output, and send it to pitch_estimator
           when WAIT_RESULT =>
             if (estimate_done='1') then
-	      done_o<='1';
-	      state<=IDLE;
-	    end if;
+	            done_o<='1';
+	            state<=IDLE;
+	          end if;
 
         end case;
       end if;

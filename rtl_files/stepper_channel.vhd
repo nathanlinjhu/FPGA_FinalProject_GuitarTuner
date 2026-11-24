@@ -24,8 +24,8 @@ entity stepper_channel is
 	abort_i : in std_logic;
 	go_i : in std_logic;
 	dir_i : in std_logic;
-        count_i : in integer;
-        step_o : out std_logic;
+  count_i : in integer;
+  step_o : out std_logic;
 	dir_o : out std_logic;
 	busy_o : out std_logic
 	);
