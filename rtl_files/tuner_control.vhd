@@ -158,7 +158,7 @@ begin
 	      -- Check each string; initialize for no movement/LED
               for i in 0 to 3 loop
                 n:=0;
-	        green(i)<='0';
+	              green(i)<='0';
                 red(i)<='0';
 		--Invalid string keeps zero requested pulses; LEDs off; completion will be disallowed
                 if (valid_i(i)='0') then

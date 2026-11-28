@@ -82,7 +82,7 @@ begin
 	    -- Store data when receiving a frame and FFT output is valid
             if rst = '0' and state = RECEIVE and valid_i = '1' then
   		-- Get the address of the FFT bin
-                address_v := to_integer(unsigned(user_i(11 downto 0)));
+                address_v := to_integer(unsigned(user_i(11 downto 0))); -- 4096 bins
 		-- If said address is less than or equal to 300 (i.e. within our accepted range), 
  		-- extract real and imaginary components and compute the squares
 		-- Update the power for the corresponding FFT bin
