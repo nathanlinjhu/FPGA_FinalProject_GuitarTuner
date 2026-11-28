@@ -14,7 +14,7 @@ package tuner_pkg is
 
   --TARGET_Q8 was found by string target frequency, times 4096/4000 times 256 and then rounded to try and eliminate fractions
   constant TARGET_Q8 : int4_t := (28836,38491,51380,64734);
-  constant TOL_Q8 : int4_t := (83,111,149,187); -- approximately +/-5 cents of tolerance
+  constant TOL_Q8 : int4_t := (128,128,149,187); -- approximately +/-5 cents of tolerance
 
   -- Bins that will be accepted for the tuning range of each string
   constant LOW_BIN : int4_t := (103,141,191,243);

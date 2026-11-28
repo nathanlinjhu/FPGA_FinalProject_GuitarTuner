@@ -35,8 +35,8 @@ entity tuner_control is
        motor_count_o : out int4_t;
        green_o : out std_logic_vector(3 downto 0);
        red_o : out std_logic_vector(3 downto 0);
-       running_o : out std_logic_vector(3 downto 0);
-       done_o : out std_logic_vector(3 downto 0);
+       running_o : out std_logic;
+       done_o : out std_logic;
        fault_o : out std_logic
        );
 end;
