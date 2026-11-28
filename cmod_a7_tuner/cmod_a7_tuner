@@ -7,29 +7,44 @@ set_property -dict { PACKAGE_PIN B18 IOSTANDARD LVCMOS33 } [get_ports {btn[1]}]
 set_property -dict { PACKAGE_PIN H2 IOSTANDARD LVCMOS33 } [get_ports {vauxp12}]
 set_property -dict { PACKAGE_PIN J2 IOSTANDARD LVCMOS33 } [get_ports {vauxn12}]
 # vauxp12/vauxn12 use the onboard analog network for DIP pin 16. Do not tie the top-level vauxn12 signal to a constant.
-set_property -dict { PACKAGE_PIN G17 IOSTANDARD LVCMOS33 } [get_ports {step_o[0]}]
-set_property -dict { PACKAGE_PIN G19 IOSTANDARD LVCMOS33 } [get_ports {dir_o[0]}]
-set_property -dict { PACKAGE_PIN N18 IOSTANDARD LVCMOS33 } [get_ports {step_o[1]}]
-set_property -dict { PACKAGE_PIN L18 IOSTANDARD LVCMOS33 } [get_ports {dir_o[1]}]
-set_property -dict { PACKAGE_PIN H17 IOSTANDARD LVCMOS33 } [get_ports {step_o[2]}]
-set_property -dict { PACKAGE_PIN H19 IOSTANDARD LVCMOS33 } [get_ports {dir_o[2]}]
-set_property -dict { PACKAGE_PIN J19 IOSTANDARD LVCMOS33 } [get_ports {step_o[3]}]
-set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS33 } [get_ports {dir_o[3]}]
-# External LED groups A,D,G,B use DIP 1..12, in green/red order.
-set_property -dict { PACKAGE_PIN M3 IOSTANDARD LVCMOS33 } [get_ports {green_o[0]}]
-set_property -dict { PACKAGE_PIN L3 IOSTANDARD LVCMOS33 } [get_ports {red_o[0]}]
-set_property -dict { PACKAGE_PIN K3 IOSTANDARD LVCMOS33 } [get_ports {green_o[1]}]
-set_property -dict { PACKAGE_PIN C15 IOSTANDARD LVCMOS33 } [get_ports {red_o[1]}]
-set_property -dict { PACKAGE_PIN A15 IOSTANDARD LVCMOS33 } [get_ports {green_o[2]}]
-set_property -dict { PACKAGE_PIN B15 IOSTANDARD LVCMOS33 } [get_ports {red_o[2]}]
-set_property -dict { PACKAGE_PIN J3 IOSTANDARD LVCMOS33 } [get_ports {green_o[3]}]
-set_property -dict { PACKAGE_PIN J1 IOSTANDARD LVCMOS33 } [get_ports {red_o[3]}]
+
+# A string: step = 1, Dir = 3
+set_property -dict { PACKAGE_PIN M3 IOSTANDARD LVCMOS33 } [get_ports {step_o[0]}]
+set_property -dict { PACKAGE_PIN A16 IOSTANDARD LVCMOS33 } [get_ports {dir_o[0]}]
+
+# D string: step = 6, Dir = 8
+set_property -dict { PACKAGE_PIN H1 IOSTANDARD LVCMOS33 } [get_ports {step_o[1]}]
+set_property -dict { PACKAGE_PIN B15 IOSTANDARD LVCMOS33 } [get_ports {dir_o[1]}]
+
+# G string: step = 48, Dir = 46
+set_property -dict { PACKAGE_PIN V8 IOSTANDARD LVCMOS33 } [get_ports {step_o[2]}]
+set_property -dict { PACKAGE_PIN W7 IOSTANDARD LVCMOS33 } [get_ports {dir_o[2]}]
+
+# B string: step = 43, Dir = 41
+set_property -dict { PACKAGE_PIN W6 IOSTANDARD LVCMOS33 } [get_ports {step_o[3]}]
+set_property -dict { PACKAGE_PIN U5 IOSTANDARD LVCMOS33 } [get_ports {dir_o[3]}]
+
+# A LEDs: Green = 19, Red = 18
+set_property -dict { PACKAGE_PIN P3 IOSTANDARD LVCMOS33 } [get_ports {green_o[0]}]
+set_property -dict { PACKAGE_PIN N3 IOSTANDARD LVCMOS33 } [get_ports {red_o[0]}]
+
+# D LEDs: Green = 22, Red = 21
+set_property -dict { PACKAGE_PIN N2 IOSTANDARD LVCMOS33 } [get_ports {green_o[1]}]
+set_property -dict { PACKAGE_PIN N1 IOSTANDARD LVCMOS33 } [get_ports {red_o[1]}]
+
+# G LEDs: Green = 30, Red = 31
+set_property -dict { PACKAGE_PIN T2 IOSTANDARD LVCMOS33 } [get_ports {green_o[2]}]
+set_property -dict { PACKAGE_PIN U1 IOSTANDARD LVCMOS33 } [get_ports {red_o[2]}]
+
+# B LEDs: Green = 27, Red = 38
+set_property -dict { PACKAGE_PIN T3 IOSTANDARD LVCMOS33 } [get_ports {green_o[3]}]
+set_property -dict { PACKAGE_PIN R2 IOSTANDARD LVCMOS33 } [get_ports {red_o[3]}]
+
+# LED[1] = running, LED[2] = done, pin 13 = fault
 set_property -dict { PACKAGE_PIN A17 IOSTANDARD LVCMOS33 } [get_ports {running_o}]
 set_property -dict { PACKAGE_PIN C16 IOSTANDARD LVCMOS33 } [get_ports {done_o}]
-set_property -dict { PACKAGE_PIN L1 IOSTANDARD LVCMOS33 } [get_ports {fault_o}]
+#set_property -dict { PACKAGE_PIN L1 IOSTANDARD LVCMOS33 } [get_ports {fault_o}]
+
 # fault_o is DIP pin 13: optional external fault LED (with resistor).
 # Synchronizer registers carry ASYNC_REG. Add a first-stage-only timing exception
 # after checking the synthesized cell names; do not false-path the entire design.
-
-
-
